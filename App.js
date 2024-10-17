@@ -1,16 +1,32 @@
 import React, { useState } from 'react';
 import { View, Text, Image, TouchableOpacity, Alert, StyleSheet, TextInput } from 'react-native';
-import image from './assets/pablo.jpg'; 
+import image from './assets/pablo.jpg';
+import { StatusBar } from 'expo-status-bar';
+import * as ImagePicker from 'expo-image-picker';
 
 const App = () => {
   const [input1, setInput1] = useState('');
   const [input2, setInput2] = useState('');
   const [count, setCount] = useState(0);
+  
   const onPress = () => setCount(prevCount => prevCount + 1);
 
   const handlePress = () => {
     Alert.alert(`Input 1: ${input1}`, `Input 2: ${input2}`);
     console.log('hola');
+  };
+
+  const openImagePickerAsync = async () => {
+    let permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (permissionResult.granted === false) {
+      alert('Se requiere el permiso para acceder a las fotos');
+      return;
+    }
+    let pickerResult = await ImagePicker.launchImageLibraryAsync();
+    if (pickerResult.canceled === true) {
+      return;
+    }
+    console.log(pickerResult);
   };
 
   return (
@@ -31,16 +47,26 @@ const App = () => {
         value={input2}
         onChangeText={setInput2}
       />
+      
       <View style={style.countContainer}>
-        <Text>Count:{count}</Text>
+        <Text>Count: {count}</Text>
       </View>
-      <TouchableOpacity
-        style={style.button}
-        onPress={onPress}
-      >
+      
+      <TouchableOpacity style={style.button} onPress={onPress}>
         <Text style={style.buttonText}>Presioname</Text>
       </TouchableOpacity>
 
+      <Text style={style.title}>Presiona en la imagen</Text>
+      <TouchableOpacity onPress={openImagePickerAsync}>
+        <Image
+          source={{ uri: 'https://picsum.photos/200/200' }}
+          style={style.image}
+        />
+      </TouchableOpacity>
+
+      <TouchableOpacity onPress={() => console.log('zamba')} style={style.button}>
+        <Text style={style.buttonText}>Compartir</Text>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -53,8 +79,8 @@ const style = StyleSheet.create({
     backgroundColor: 'lightblue',
   },
   title: {
-    fontSize: 60,
-    marginBottom: 30,
+    fontSize: 30,
+    marginBottom: 20,
   },
   image: {
     height: 200,
@@ -87,3 +113,4 @@ const style = StyleSheet.create({
 });
 
 export default App;
+
